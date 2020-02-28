@@ -30,10 +30,24 @@ def about():
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if current_user.is_authenticated:
+        # if user is already logged in, just redirect them to our secure page
+        # or some other page like a dashboard
+        return redirect(url_for('secure-page'))
     form = LoginForm()
-    if request.method == "POST":
+    if request.method == "POST" and form.validate_on_submit():
         # change this to actually validate the entire form submission
         # and not just one field
+         username = form.username.data
+         password = form.password.data
+
+         user = UserProfile.query.filter_by(username=username).first()
+
+         if user is not None and check_password_hash(user.password, password):
+            remember_me = False
+
+         flash('Logged in successfully.', 'success')
+
         if form.username.data:
             # Get the username and password values from the form.
 
